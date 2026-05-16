@@ -7,11 +7,12 @@ function Saved() {
 
   useEffect(() => {
     async function getPosts() {
+      setLoadSavedPosts(true);
       let res = await api.get("user/posts/saved");
       if (!res.error) {
         let posts = res.data.posts;
 
-        addPostsToSection(posts, "saved");
+        addPostsToSection(posts, "saved", { replace: true });
       }
       setLoadSavedPosts(false);
     }

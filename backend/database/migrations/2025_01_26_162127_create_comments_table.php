@@ -16,6 +16,10 @@ return new class extends Migration
             $table->unsignedBigInteger('post_id');
             $table->unsignedBigInteger('user_id');
             $table->text('body');
+            $table->integer('like')->default(0);
+            $table->integer('dislike')->default(0);
+            $table->integer('love')->default(0);
+            $table->integer('celebrate')->default(0);
             $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade') ;
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade') ;
             $table->timestamps();

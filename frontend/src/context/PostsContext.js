@@ -5,74 +5,62 @@ const postsContext = createContext();
 export function PostsProvider({ children }) {
   const [allPosts, setAllPosts] = useState({
     byId: {},
-
-    home: {
-      allIds: [],
-    },
-
-    history: {
-      allIds: [],
-    },
-
-    saved: {
-      allIds: [],
-    },
-
-    currentVisitedUser: {
-      allIds: [],
-    },
+    home: { allIds: [] },
+    history: { allIds: [] },
+    saved: { allIds: [] },
+    currentVisitedUser: { allIds: [] },
   });
 
   const [loadHomePosts, setLoadHomePosts] = useState(true);
   const [hasFetchedHomePosts, setHasFetchedHomePosts] = useState(false);
-
   const [homeCurrentPage, setHomeCurrentPage] = useState(1);
   const [homeLastPage, setHomeLastPage] = useState();
-
   const [loadHistoryPosts, setLoadHistoryPosts] = useState(true);
-
   const [loadSavedPosts, setLoadSavedPosts] = useState(true);
 
-  function addPostsToSection(posts, section) {
-    setAllPosts((p) => {
-      const receivedPostIds = [];
-      const currentById = p.byId;
-      const currentAllIds = p[section].allIds;
+  function addPostsToSection(posts, section, options = {}) {
+    const { prepend = false, replace = false } = options;
 
-      const newById = { ...currentById };
-      // const newAllIds = [...currentAllIds];
+    setAllPosts((prev) => {
+      const normalizedPosts = posts.filter((post) => post?.id != null);
+      const incomingIds = normalizedPosts.map((post) => post.id);
+      const newById = { ...prev.byId };
 
-      posts.forEach((newPost) => {
-        if (newPost?.id != null) {
-          // if the post exist merge it
-          const id = newPost.id;
-          const oldPost = allPosts.byId[id];
-          newById[newPost.id] = { ...oldPost, ...newPost };
-        } else {
-          newById[newPost.id] = newPost;
-        }
-        receivedPostIds.push(newPost.id);
+      normalizedPosts.forEach((post) => {
+        const oldPost = prev.byId[post.id];
+        newById[post.id] = { ...oldPost, ...post };
       });
 
-      const newAllIds = [...new Set([...currentAllIds, ...receivedPostIds])];
+      const currentAllIds = prev[section]?.allIds ?? [];
+      let allIds = [];
+
+      if (replace) {
+        allIds = [...new Set(incomingIds)];
+      } else if (prepend) {
+        allIds = [...new Set([...incomingIds, ...currentAllIds])];
+      } else {
+        allIds = [...new Set([...currentAllIds, ...incomingIds])];
+      }
 
       return {
-        ...p,
+        ...prev,
         byId: newById,
         [section]: {
-          allIds: newAllIds,
+          allIds,
         },
       };
     });
   }
 
+  function prependPostToSection(post, section) {
+    addPostsToSection([post], section, { prepend: true });
+  }
+
   function deletePost(postId) {
     setAllPosts((prev) => {
-      // Remove post from byId
       const newById = { ...prev.byId };
       delete newById[postId];
 
-      // Remove post ID from all sections
       const newState = { ...prev, byId: newById };
 
       Object.keys(newState).forEach((key) => {
@@ -90,15 +78,13 @@ export function PostsProvider({ children }) {
 
   function toggleSavedPostState(postId) {
     setAllPosts((prev) => {
-      // Copy the existing post from global byId
       const existingPost = prev.byId[postId];
+      if (!existingPost) return prev;
 
       const newSavedPostsIds = prev.saved.allIds.filter(
         (currPId) => currPId !== postId
       );
-      if (!existingPost) return prev; // avoid crash if post doesn't exist
 
-      // Toggle is_saved
       const updatedPost = {
         ...existingPost,
         is_saved: !existingPost.is_saved,
@@ -117,19 +103,17 @@ export function PostsProvider({ children }) {
     });
   }
 
-  function updatePost(updatedPost, section) {
-    const id = updatedPost.id;
-    const prevPost = allPosts.byId[id];
-
-    // Merge with previous post if exists
-    const mergedPost = { ...prevPost, ...updatedPost };
+  function updatePost(updatedPost) {
+    const id = updatedPost?.id;
+    if (!id) return;
 
     setAllPosts((prev) => {
+      const prevPost = prev.byId[id] ?? {};
       return {
         ...prev,
         byId: {
           ...prev.byId,
-          [id]: mergedPost,
+          [id]: { ...prevPost, ...updatedPost },
         },
       };
     });
@@ -143,19 +127,16 @@ export function PostsProvider({ children }) {
         setAllPosts,
         toggleSavedPostState,
         addPostsToSection,
+        prependPostToSection,
         allPosts,
-        // //
         loadHomePosts,
         setLoadHomePosts,
         hasFetchedHomePosts,
         setHasFetchedHomePosts,
-        // //
         loadHistoryPosts,
         setLoadHistoryPosts,
-        // //
         loadSavedPosts,
         setLoadSavedPosts,
-        // //
         homeCurrentPage,
         setHomeCurrentPage,
         homeLastPage,

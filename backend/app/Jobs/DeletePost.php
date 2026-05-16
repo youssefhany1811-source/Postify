@@ -25,7 +25,7 @@ class DeletePost implements ShouldQueue
     {
         // Delete the associated image if it exists
         if ($this->post->image) {
-            Storage::disk(config('filesystems.default'))->delete($this->post->image);
+            Storage::disk(config('filesystems.posts_disk', 'public'))->delete($this->post->image);
         }
 
         // Delete the post

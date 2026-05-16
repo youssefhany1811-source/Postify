@@ -7,8 +7,7 @@ import { usePosts } from "../context/PostsContext";
 export default function VisitedUser() {
   const { visitedUserId } = useParams(); // Get the user ID from the URL
   const [user, setUser] = useState(null); // Store user data
-  const [posts, setPosts] = useState([]); // Store user data
-  const [loading, setLoading] = useState(null); // Store user data
+  const [loading, setLoading] = useState(true); // Store user data
 
   const nav = useNavigate();
   const { addPostsToSection } = usePosts();
@@ -21,7 +20,7 @@ export default function VisitedUser() {
         const posts = res.data.posts;
         if (!res.error) {
           setUser(res.data.user);
-          addPostsToSection(posts, "currentVisitedUser");
+          addPostsToSection(posts, "currentVisitedUser", { replace: true });
         } else {
           console.error("Failed to fetch user:", res.message);
           nav("/not-found", { replace: true }); // Redirect if user not found
@@ -55,8 +54,6 @@ export default function VisitedUser() {
 
       {/* User Posts */}
       <DisplayVisitedUserPosts
-        posts={posts}
-        setPosts={setPosts}
         loading={loading}
         type='view'
       />

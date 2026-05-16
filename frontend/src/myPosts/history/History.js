@@ -13,11 +13,12 @@ function History() {
 
   useEffect(() => {
     async function getPosts() {
+      setLoadHistoryPosts(true);
       let res = await api.get("user/posts");
       if (!res.error) {
         let posts = res.data.posts;
         setLikesCount(res.data.likes_count);
-        addPostsToSection(posts, "history");
+        addPostsToSection(posts, "history", { replace: true });
       }
 
       setLoadHistoryPosts(false);

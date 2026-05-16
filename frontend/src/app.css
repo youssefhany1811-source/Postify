@@ -1,6 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --bg-start: #07121e;
+  --bg-end: #0f172a;
+  --panel: rgba(15, 23, 42, 0.72);
+  --panel-border: rgba(125, 211, 252, 0.26);
+  --text-main: #f8fafc;
+  --text-soft: #cbd5e1;
+  --accent: #22d3ee;
+  --accent-2: #f59e0b;
+}
 
 .btn {
   @apply w-[100%] border rounded-[10px] mt-10 flex items-center justify-center gap-x-[5px];
@@ -10,8 +23,23 @@
   @apply max-w-[700px] m-auto mb-[50px];
 }
 
+html,
+body {
+  min-height: 100%;
+}
+
 html {
   @apply bg-primary;
+}
+
+body {
+  color: var(--text-main);
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  min-height: 100vh;
+  background:
+    radial-gradient(1400px 700px at -20% -10%, rgba(34, 211, 238, 0.18), transparent 55%),
+    radial-gradient(900px 500px at 110% 10%, rgba(245, 158, 11, 0.15), transparent 50%),
+    linear-gradient(165deg, var(--bg-start), var(--bg-end));
 }
 
 label {
@@ -19,23 +47,18 @@ label {
   margin-bottom: 5px;
 }
 
-body {
-  color: white;
-  min-height: 100vh;
-}
-
 input {
   background-color: transparent;
-  border-radius: 5px;
-  border: white solid 1px;
-  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  height: 40px;
   margin-bottom: 12px;
-  padding-left: 8px;
-  padding-right: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
   font-size: 14px;
+  color: var(--text-main);
 }
 
-/* To prevent browser auto-fill background color (especially in Chrome) */
 input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px transparent inset;
   -webkit-text-fill-color: white !important;
@@ -47,7 +70,6 @@ input:-webkit-autofill:focus {
   -webkit-text-fill-color: white !important;
 }
 
-/* For Firefox */
 input:-moz-autofill {
   box-shadow: 0 0 0px 1000px transparent inset;
   -moz-text-fill-color: white !important;
@@ -56,16 +78,12 @@ input:-moz-autofill {
 textarea {
   width: 100%;
   word-wrap: break-word;
-  white-space: pre-wrap; /* Keeps formatting and line breaks */
-  color: white;
+  white-space: pre-wrap;
+  color: var(--text-main);
   background-color: transparent;
   border: none;
   outline: none !important;
   resize: none;
-}
-input:-webkit-autofill {
-  -webkit-text-fill-color: white !important;
-  transition: background-color 5000s ease-in-out 0s;
 }
 
 button {
@@ -76,27 +94,99 @@ button {
 
 .custom-scroll-bar {
   overflow: auto;
-  scrollbar-width: thin; /* For Firefox */
-  scrollbar-color: #555 #222; /* Thumb and Track color */
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #0f172a;
 }
 
-/* WebKit (Chrome, Edge, Safari) */
 .custom-scroll-bar::-webkit-scrollbar {
   width: 8px;
 }
 
 .custom-scroll-bar::-webkit-scrollbar-track {
-  background: #222; /* Dark background */
+  background: #0f172a;
   border-radius: 4px;
 }
 
 .custom-scroll-bar::-webkit-scrollbar-thumb {
-  background: #555; /* Dark gray thumb */
+  background: #475569;
   border-radius: 4px;
 }
 
 .custom-scroll-bar::-webkit-scrollbar-thumb:hover {
-  background: #777; /* Lighter gray on hover */
+  background: #64748b;
+}
+
+.page-title {
+  @apply text-4xl md:text-5xl font-bold mb-6 mt-5;
+  letter-spacing: -0.02em;
+}
+
+.post-card {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.78), rgba(8, 47, 73, 0.55));
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  padding: 16px;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(8, 47, 73, 0.28);
+  border-color: rgba(34, 211, 238, 0.55);
+}
+
+.cool-panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.4);
+}
+
+.upload-zone {
+  border: 2px dashed rgba(125, 211, 252, 0.45);
+  border-radius: 14px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-soft);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.upload-zone:hover {
+  border-color: var(--accent);
+  background-color: rgba(34, 211, 238, 0.06);
+}
+
+.action-btn {
+  background: linear-gradient(90deg, var(--accent), #0ea5e9);
+  color: #062238;
+  font-weight: 700;
+  min-width: 120px;
+}
+
+.cool-title-input {
+  @apply w-full mb-6 text-4xl md:text-5xl;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.cool-body-input {
+  @apply w-full text-xl md:text-2xl min-h-[220px];
+  color: var(--text-soft);
+}
+
+.post-cover-preview {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid rgba(125, 211, 252, 0.3);
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.35);
 }
 
 .not-found-container {
@@ -105,8 +195,8 @@ button {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #1b1c1d;
-  color: #333;
+  background-color: #0f172a;
+  color: #334155;
 }
 
 .not-found-container h1 {
@@ -122,7 +212,7 @@ button {
 
 .not-found-container a {
   padding: 0.75rem 1.5rem;
-  background-color: #007bff;
+  background-color: #0ea5e9;
   color: white;
   border-radius: 0.375rem;
   text-decoration: none;
@@ -130,45 +220,39 @@ button {
 }
 
 .not-found-container a:hover {
-  background-color: #0056b3;
+  background-color: #0284c7;
 }
 
 .preload-spinner-container {
   font-size: 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
   position: fixed;
-  inset: 0; /* Covers the whole screen */
+  inset: 0;
   display: flex;
-  flex-direction: column; /* Stack spinner and text vertically */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #1b1c1d; /* Or your app's background */
+  background: #0f172a;
   z-index: 9999;
   color: white;
 }
 
 .preload-spinner {
-  /* Tailwind: h-16 w-16 */
-  height: 4rem; /* 64px */
-  width: 4rem; /* 64px */
-
-  /* Tailwind: rounded-full border-t-4 border-blue-500 border-solid */
+  height: 4rem;
+  width: 4rem;
   border-radius: 50%;
-  border-width: 4px; /* border-t-4 applies to top, but we need width everywhere for a spinner */
+  border-width: 4px;
   border-style: solid;
-  border-color: transparent; /* Make other borders transparent */
-  border-top-color: #3b82f6; /* Tailwind: border-blue-500 */
-
-  /* Tailwind: animate-spin */
+  border-color: transparent;
+  border-top-color: #22d3ee;
   animation: spin 1s linear infinite;
 }
 
 .preload-spinner-text {
-  /* Tailwind: text-lg font-semibold */
-  margin-top: 1rem; /* Add some space */
-  color: white; /* Adjust color as needed */
-  font-size: 1.125rem /* 18px */;
-  line-height: 1.75rem /* 28px */;
+  margin-top: 1rem;
+  color: white;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
   font-weight: 600;
 }
 

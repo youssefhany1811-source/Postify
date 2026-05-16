@@ -17,6 +17,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Posts Filesystem Disk
+    |--------------------------------------------------------------------------
+    |
+    | Dedicated disk for post images so uploads/URLs stay predictable even if
+    | the app default disk changes for other features.
+    |
+    */
+    'posts_disk' => env('POSTS_FILESYSTEM_DISK', 'public'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |

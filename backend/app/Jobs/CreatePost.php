@@ -5,8 +5,6 @@ namespace App\Jobs;
 use App\Events\PostPublished;
 use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
-use App\Models\User;
-use App\Services\ImageResizer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Auth;
@@ -35,15 +33,16 @@ class CreatePost implements ShouldQueue
             $image = $request->file('image');
 
             try {
-                // Store on the app's configured default filesystem disk
-                $imagePath = $image->store('posts/images', config('filesystems.default'));
-                Log::info('Image uploaded successfully to S3', [
+                $postsDisk = config('filesystems.posts_disk', 'public');
+                $imagePath = $image->store('posts/images', $postsDisk);
+                Log::info('Image uploaded successfully', [
                     'path' => $imagePath,
+                    'disk' => $postsDisk,
                     'original_name' => $image->getClientOriginalName(),
                     'size' => $image->getSize()
                 ]);
             } catch (\Exception $e) {
-                Log::error('Failed to upload image to S3', [
+                Log::error('Failed to upload image', [
                     'error' => $e->getMessage(),
                     'original_name' => $image->getClientOriginalName()
                 ]);
@@ -54,7 +53,7 @@ class CreatePost implements ShouldQueue
                 Log::error('Image upload returned null/false', [
                     'original_name' => $image->getClientOriginalName()
                 ]);
-                throw new \Exception('Failed to upload image to S3');
+                throw new \Exception('Failed to upload image');
             }
         }
 

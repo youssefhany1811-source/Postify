@@ -28,8 +28,14 @@ class Post extends Model
         if (!$this->image) {
             return null;
         }
-        // Use the default disk (which should be s3 in production)
-        return Storage::disk(config('filesystems.default'))->url($this->image);
+        $disk = Storage::disk(config('filesystems.posts_disk', 'public'));
+        $url = $disk->url($this->image);
+
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+
+        return rtrim(config('app.url'), '/') . '/' . ltrim($url, '/');
     }
 
     public function user()
@@ -52,14 +58,14 @@ class Post extends Model
         return $this->belongsToMany(User::class, 'liked_posts')->withTimestamps();
     }
 
-    static public function getHomePosts()
+    static public function getHomePosts(int $page = 1)
     {
         return Post::with('user')
             ->withExists([
                 'savedByUsers as is_saved' => fn($q) => $q->where('user_id', Auth::id())
             ])
             ->latest()
-            ->paginate(5);
+            ->paginate(5, ['*'], 'page', $page);
     }
 
     public function scopeForAuthenticatedUser($query)

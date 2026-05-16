@@ -5,7 +5,7 @@ import api from "../../api/axios";
 import HomeSkeleton from "../skeletons/HomeSkeleton";
 import { usePosts } from "../../context/PostsContext";
 
-function DisplayVisitedUserPosts({ loading, pageTitle }) {
+function DisplayVisitedUserPosts({ loading, pageTitle = "Posts" }) {
   const location = useLocation();
   const { toggleSavedPostState, allPosts } = usePosts();
 
@@ -60,13 +60,13 @@ function DisplayVisitedUserPosts({ loading, pageTitle }) {
 
   return (
     <>
-      <h1 className='text-5xl mb-5 mt-5'>{pageTitle}</h1>
+      <h1 className='page-title'>{pageTitle}</h1>
 
       {!loading ? (
         <>
           {allPosts.currentVisitedUser.allIds.length !== 0 ? (
             allPosts.currentVisitedUser.allIds
-              .map((id, index) => {
+              .map((id) => {
                 const post = allPosts.byId[id];
                 if (!post) return null;
 
@@ -83,17 +83,17 @@ function DisplayVisitedUserPosts({ loading, pageTitle }) {
                   <Link
                     state={{ from: location.pathname }}
                     to={`/view/${id}`}
-                    className='mb-5 block'
-                    key={index}
+                    className='mb-4 block'
+                    key={id}
                   >
-                    <div className='flex gap-x-[10px] max-w-[680px] justify-between break-all'>
+                    <div className='post-card flex gap-x-[14px] max-w-[700px] justify-between break-all'>
                       <div className='w-[100%] flex flex-col justify-center gap-y-[12px]'>
                         <div>
                           <DisplayUser user={user} />
-                          <h1 className='text-2xl font-bold'>{title || ""}</h1>
+                          <h1 className='text-xl font-bold text-white'>{title || ""}</h1>
                         </div>
 
-                        <div className='flex mb-[10px] gap-x-[20px] items-center'>
+                        <div className='text-slate-300 text-sm flex gap-x-[20px] items-center'>
                           {created_at && displayDate(created_at)}
                           <div className='flex items-center gap-2 z-10'>
                             <SaveIcon
@@ -108,12 +108,11 @@ function DisplayVisitedUserPosts({ loading, pageTitle }) {
                       {image_url && (
                         <img
                           src={image_url}
-                          alt=''
-                          className='w-[150px] min-w-[150px] h-[140px] object-cover'
+                          alt={title || "post"}
+                          className='w-[160px] min-w-[160px] h-[120px] rounded-xl object-cover shadow-md'
                         />
                       )}
                     </div>
-                    <div className='h-[1px] w-[70%] bg-secondary mb-[25px]'></div>
                   </Link>
                 );
               })

@@ -1,4 +1,3 @@
-// ------------------ Imports ------------------
 import { Link, useLocation } from "react-router-dom";
 import { displayDate } from "../../utility/functions";
 import { BsBookmarkCheckFill, BsBookmark } from "react-icons/bs";
@@ -6,15 +5,11 @@ import api from "../../api/axios";
 import HomeSkeleton from "../skeletons/HomeSkeleton";
 import { usePosts } from "../../context/PostsContext";
 
-function DisplayHomePosts({ pageTitle }) {
+function DisplayHomePosts({ pageTitle = "Latest Posts" }) {
   const location = useLocation();
   const { allPosts, loadHomePosts, toggleSavedPostState } = usePosts();
 
-  // ------------------ Components & Functions ------------------
-
   async function handleSavePost(e, post) {
-    console.log(post);
-
     e.preventDefault();
     e.stopPropagation();
     const postId = post.id;
@@ -22,9 +17,9 @@ function DisplayHomePosts({ pageTitle }) {
     toggleSavedPostState(postId);
 
     try {
-      let res = await api.post(`posts/${postId}/save`);
+      await api.post(`posts/${postId}/save`);
     } catch (error) {
-      console.log("+_+_+", error);
+      console.log(error);
     }
   }
 
@@ -40,20 +35,18 @@ function DisplayHomePosts({ pageTitle }) {
   }
 
   function DisplayUser({ user }) {
-    console.log("USERRR", user);
-
     const avatar = user.avatar;
     const username = user.username;
     return (
       <Link
         to={`/user/${user.id}`}
-        className='flex mb-3 items-center gap-x-[6px] z-20'
+        className='text-slate-200 flex mb-3 items-center gap-x-[8px] z-20'
       >
         {avatar && (
           <img
-            className='w-[34px] rounded-full h-[34px] object-cover'
+            className='w-[34px] rounded-full h-[34px] object-cover ring-2 ring-white/20'
             src={avatar}
-            alt=''
+            alt={username || "user avatar"}
           />
         )}
         {username && username}
@@ -62,26 +55,19 @@ function DisplayHomePosts({ pageTitle }) {
   }
 
   function viewOrEditPost(canUpdate) {
-    console.log("canUpdate", canUpdate);
-
     if (canUpdate) return "edit";
     return "view";
   }
 
-  // ------------------ Main return ------------------
-
   return (
     <>
-      {}
-      <h1 className='text-5xl mb-5 mt-5'>{pageTitle}</h1>
+      <h1 className='page-title'>{pageTitle}</h1>
       {!loadHomePosts ? (
         <>
           {allPosts.home.allIds.length !== 0 ? (
             allPosts.home.allIds
-              .map((id, index) => {
+              .map((id) => {
                 const post = allPosts.byId[id];
-
-                // Safety check - skip if post doesn't exist
                 if (!post) return null;
 
                 const user = post.user;
@@ -96,17 +82,17 @@ function DisplayHomePosts({ pageTitle }) {
                   <Link
                     state={{ from: location.pathname }}
                     to={`/${viewOrEditPost(canUpdate)}/${id}`}
-                    className='mb-5 block'
-                    key={index}
+                    className='mb-4 block'
+                    key={id}
                   >
-                    <div className='flex gap-x-[10px] max-w-[680px] justify-between break-all'>
+                    <div className='post-card flex gap-x-[14px] max-w-[700px] justify-between break-all'>
                       <div className='w-[100%] flex flex-col justify-center gap-y-[12px]'>
                         <div>
                           {user && <DisplayUser user={user} />}
-                          <h1 className='text-lg font-bold'>{title}</h1>
+                          <h1 className='text-xl font-bold text-white'>{title}</h1>
                         </div>
 
-                        <div className='flex mb-[10px] gap-x-[20px] items-center'>
+                        <div className='text-slate-300 text-sm flex gap-x-[20px] items-center'>
                           {created_at && displayDate(created_at)}
                           <div className='flex items-center gap-2 z-10'>
                             <SaveIcon
@@ -121,18 +107,17 @@ function DisplayHomePosts({ pageTitle }) {
                       {image && (
                         <img
                           src={image}
-                          alt=''
-                          className='w-[150px] min-w-[150px] h-[140px] object-cover'
+                          alt={title}
+                          className='w-[160px] min-w-[160px] h-[120px] rounded-xl object-cover shadow-md'
                         />
                       )}
                     </div>
-                    <div className='h-[1px] w-[70%] bg-secondary mb-[25px]'></div>
                   </Link>
                 );
               })
-              .filter(Boolean) // Remove null entries
+              .filter(Boolean)
           ) : (
-            <></>
+            <div className='text-slate-300'>No posts found yet.</div>
           )}
         </>
       ) : (

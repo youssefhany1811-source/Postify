@@ -20,6 +20,8 @@ class CommentFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => \App\Models\User::factory(),
+            'post_id' => \App\Models\Post::factory(),
             'body' => $this->faker->sentence(rand(5, 20)),
             'like' => $this->faker->numberBetween(0, 100),
             'dislike' => $this->faker->numberBetween(0, 50),

@@ -27,17 +27,11 @@ class GetHomePosts implements ShouldQueue
     public function handle()
     {
         $page = request()->get('page', 1);
-        $home_posts = Cache::remember('home_posts_page_' . $page, now()->addMinutes(10), function () {
-            // Log::info('Querying posts from DB');
-            return Post::with('user')
-                ->withExists([
-                    'savedByUsers as is_saved' => fn($q) => $q->where('user_id', Auth::id())
-                ])
-                ->latest()
-                ->paginate(5);
+        $home_posts = Cache::remember('home_posts_page_' . $page, now()->addMinutes(10), function () use ($page) {
+            return Post::getHomePosts((int) $page);
         });
 
-        $posts = $home_posts->getCollection()->slice(1)->values();
+        $posts = $home_posts->getCollection()->values();
         foreach ($posts as $p) {
             $p['section'] = 'home';
             $p['canUpdate'] = Gate::allows('canEdit', $p);

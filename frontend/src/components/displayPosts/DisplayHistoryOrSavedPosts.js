@@ -11,7 +11,6 @@ function DisplayHistoryOrSavedPosts({ loading, pageTitle, type }) {
   const category = pageTitle.toLocaleLowerCase(); // get posts group history | saved
   const location = useLocation();
   const { allPosts, toggleSavedPostState } = usePosts();
-  console.log("allPosts =>>", allPosts);
 
   async function handleSavePost(e, post) {
     e.preventDefault();
@@ -63,10 +62,10 @@ function DisplayHistoryOrSavedPosts({ loading, pageTitle, type }) {
     <>
       {!loading ? (
         <>
-          <h1 className='text-5xl mb-5 mt-5'>{pageTitle}</h1>
+          <h1 className='page-title'>{pageTitle}</h1>
           {allPosts[category].allIds.length !== 0 ? (
             allPosts[category].allIds
-              .map((id, index) => {
+              .map((id) => {
                 const post = allPosts.byId[id];
 
                 // Safety check - skip if post doesn't exist
@@ -83,20 +82,20 @@ function DisplayHistoryOrSavedPosts({ loading, pageTitle, type }) {
                   <Link
                     state={{ from: location.pathname }}
                     to={`/${type}/${id}`}
-                    className='mb-5 block'
-                    key={index}
+                    className='mb-4 block'
+                    key={id}
                   >
-                    <div className='flex gap-x-[10px] max-w-[680px] justify-between break-all'>
+                    <div className='post-card flex gap-x-[14px] max-w-[700px] justify-between break-all'>
                       <div className='w-[100%] flex flex-col justify-center gap-y-[12px]'>
                         <div>
                           {pageTitle !== "History" && (
                             <DisplayUser post={post} />
                           )}
 
-                          <h1 className='text-lg font-bold'>{title}</h1>
+                          <h1 className='text-xl font-bold text-white'>{title}</h1>
                         </div>
 
-                        <div className='flex  mb-[10px] gap-x-[20px] items-center'>
+                        <div className='text-slate-300 text-sm flex gap-x-[20px] items-center'>
                           {created_at && displayDate(created_at)}
                           <div className='flex items-center gap-2 z-10'>
                             {pageTitle !== "Saved" && (
@@ -118,12 +117,11 @@ function DisplayHistoryOrSavedPosts({ loading, pageTitle, type }) {
                       {image && (
                         <img
                           src={image}
-                          alt=''
-                          className='w-[150px] min-w-[150px] h-[140px] object-cover'
+                          alt={title}
+                          className='w-[160px] min-w-[160px] h-[120px] rounded-xl object-cover shadow-md'
                         />
                       )}
                     </div>
-                    <div className='h-[1px] w-[70%] bg-secondary  mb-[25px]'></div>
                   </Link>
                 );
               })

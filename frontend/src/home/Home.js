@@ -50,7 +50,6 @@ function Home() {
   } = usePosts();
 
   async function handleSearch(e) {
-    console.log(e.target.value);
     handleShow();
     let value = e.target.value;
     let res = await api.get(`posts/search?query=${value}`);
@@ -65,46 +64,48 @@ function Home() {
 
   function renderSearchInput() {
     return (
-      <div className='relative w-full max-w-md mb-[40px]'>
-        {/* Input container */}
+      <div className='relative w-full max-w-2xl mb-[40px]'>
         <div
-          className='flex items-center bg-[#1e1e1f] border border-gray-700 rounded-2xl px-3 py-1
-                      hover:border-gray-500 focus-within:border-blue-500 transition-all duration-200 shadow-sm '
+          className='flex items-center bg-slate-900/70 border border-cyan-200/20 rounded-2xl px-4 py-2
+                      hover:border-cyan-300/40 focus-within:border-cyan-400 transition-all duration-200 shadow-lg backdrop-blur-sm'
         >
-          <CiSearch className='text-gray-400 size-5 mr-2' />
+          <CiSearch className='text-cyan-200 size-5 mr-2' />
           <input
             onChange={handleSearch}
             placeholder='Search'
-            className='bg-transparent border-none w-full outline-none text-gray-200 placeholder-gray-500 !mb-0'
+            className='bg-transparent border-none w-full outline-none text-slate-100 placeholder-slate-400 !mb-0'
             autoComplete='off'
           />
         </div>
 
-        {/* Dropdown results */}
         {isVisible && (
           <div
             ref={searchRef}
             className='absolute top-full mt-2 left-0 right-0 custom-scroll-bar scrollbar-hidden
                      overflow-auto p-3 opacity-[97%] max-h-[310px] rounded-2xl z-20
-                     bg-[#1e1e1f] border border-gray-700 shadow-lg'
+                     bg-slate-900/95 border border-cyan-200/20 shadow-xl backdrop-blur-md'
           >
             {searchPosts.length > 0 ? (
               searchPosts.map((post, index) => (
                 <Link
                   to={`/view/${post.id}`}
                   key={index}
-                  className='flex gap-3 items-center mb-2 hover:bg-[#414140] p-2 rounded-lg transition'
+                  className='flex gap-3 items-center mb-2 hover:bg-cyan-500/20 p-2 rounded-lg transition'
                 >
-                  <img
-                    src={post.image_url}
-                    alt=''
-                    className='rounded min-6 w-6  h-6'
-                  />
-                  <div className='text-gray-200'>{post.title}</div>
+                  {post.image_url ? (
+                    <img
+                      src={post.image_url}
+                      alt={post.title}
+                      className='rounded min-8 w-8 h-8 object-cover'
+                    />
+                  ) : (
+                    <div className='rounded bg-cyan-800/40 min-8 w-8 h-8' />
+                  )}
+                  <div className='text-slate-100'>{post.title}</div>
                 </Link>
               ))
             ) : (
-              <div className='text-gray-400 text-center py-10'>
+              <div className='text-slate-400 text-center py-10'>
                 No results found
               </div>
             )}

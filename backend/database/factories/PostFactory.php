@@ -21,9 +21,9 @@ class PostFactory extends Factory
 
         return [
 
-            'user_id' => $this->faker->numberBetween(1, 1000),
-            'title' => $this->faker->title,
-            'body' => $this->faker->title,
+            'user_id' => \App\Models\User::factory(),
+            'title' => $this->faker->sentence,
+            'body' => $this->faker->paragraph,
             'image' => 'posts/e1bIXNMK1TdwaWqsR9Av9aU1db99P2KpFHJ4n6lt.jpg',
             'created_at' => '2025-04-01 21:21:04',
             'updated_at' => $this->faker->time,

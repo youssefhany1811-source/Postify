@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
-use App\Services\ImageResizer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
@@ -35,7 +34,7 @@ class UpdatePost implements ShouldQueue
 
             // Get the uploaded image and process it
             $image = $request->file('image');
-            $imagePath = $image->store('posts/images', config('filesystems.default'));
+            $imagePath = $image->store('posts/images', config('filesystems.posts_disk', 'public'));
         }
 
         return new self(
@@ -63,7 +62,7 @@ class UpdatePost implements ShouldQueue
 
             // Delete the old image if it exists
             if ($this->oldImagePath) {
-                Storage::disk(config('filesystems.default'))->delete($this->oldImagePath);
+                Storage::disk(config('filesystems.posts_disk', 'public'))->delete($this->oldImagePath);
             }
         }
 
