@@ -9,18 +9,24 @@ use App\Jobs\UpdatePost;
 use App\Models\CommentReaction;
 use App\Models\Post;
 use App\Notifications\PostPublished;
+use App\Services\ContentModerationService;
 use Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class PostService
 {
     private const HOME_CACHE_PREFIX = 'home_posts_page_';
     private const HOME_CACHE_PAGES_TO_CLEAR = 20;
 
+    public function __construct(private ContentModerationService $contentModeration) {}
+
     public function createPost(StorePostRequest $request): Post
     {
+        $this->validateReportContent($request->only(['title', 'body', 'location']));
+
         $imagePath = null;
 
         if ($request->hasFile('image')) {
@@ -56,10 +62,15 @@ class PostService
             'title' => $request->title,
             'body' => $request->body,
             'image' => $imagePath,
+            'category' => $request->category,
+            'location' => $request->location,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'status' => Post::STATUSES[0],
         ]);
 
         $user = Auth::user();
-        $user->notify(new PostPublished('Your post has been successfully published!'));
+        $user->notify(new PostPublished('Your report has been submitted successfully!'));
         event(new PostPublished($post));
 
         $this->clearHomePostsCache();
@@ -149,6 +160,8 @@ class PostService
 
     public function updatePost(UpdatePostRequest $request, Post $post): Post
     {
+        $this->validateReportContent($request->only(['title', 'body', 'location']));
+
         dispatch_sync(UpdatePost::fromRequest($request, $post));
         $post->refresh();
         $this->clearHomePostsCache();
@@ -167,6 +180,9 @@ class PostService
         Log::debug('Post search query', ['query' => $query]);
         return Post::where('title', 'LIKE', "%{$query}%")
             ->orWhere('body', 'LIKE', "%{$query}%")
+            ->orWhere('category', 'LIKE', "%{$query}%")
+            ->orWhere('location', 'LIKE', "%{$query}%")
+            ->orWhere('status', 'LIKE', "%{$query}%")
             ->paginate($perPage);
     }
 
@@ -175,5 +191,20 @@ class PostService
         for ($page = 1; $page <= self::HOME_CACHE_PAGES_TO_CLEAR; $page++) {
             Cache::forget(self::HOME_CACHE_PREFIX . $page);
         }
+    }
+
+    private function validateReportContent(array $content): void
+    {
+        $result = $this->contentModeration->checkReport($content);
+
+        if ($result['allowed']) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'body' => [
+                'Please edit your report before submitting. Reports cannot include offensive, abusive, or unsafe language.',
+            ],
+        ]);
     }
 }

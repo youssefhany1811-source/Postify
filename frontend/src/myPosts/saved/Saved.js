@@ -24,7 +24,7 @@ function Saved() {
       <DisplayHistoryOrSavedPosts
         toryOrSavedPosts
         loading={loadSavedPosts}
-        pageTitle={"Saved"}
+        pageTitle={"Saved Reports"}
         type={"view"}
       />
     </div>

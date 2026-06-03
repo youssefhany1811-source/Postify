@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Post;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePostRequest extends FormRequest
@@ -22,9 +23,13 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'min:5|max:200',
-            'body' => 'min:20',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4048', // 4MB max size
+            'title' => 'required|min:5|max:200',
+            'body' => 'required|min:20',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4048',
+            'category' => 'required|string|in:' . implode(',', Post::CATEGORIES),
+            'location' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ];
     }
 }

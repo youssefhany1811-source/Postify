@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import logo from "../images/leaf.png";
 
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -15,14 +15,14 @@ const { Menu, MenuButton, MenuItem, MenuItems } = await import(
 
 const navigation = [
   { name: "Home", href: "/" },
-  { name: "Write", href: "/write" },
+  { name: "Report Issue", href: "/reports/new" },
 ];
 
 const navMobile = [
   { name: "Home", href: "/" },
-  { name: "Write", href: "/write" },
-  { name: "History", href: "/posts/history" },
-  { name: "Saved", href: "/posts/saved" },
+  { name: "Report Issue", href: "/reports/new" },
+  { name: "My Reports", href: "/reports/history" },
+  { name: "Saved Reports", href: "/reports/saved" },
 ];
 const userNavigation = [
   { name: "Your Profile", href: "/profile" },
@@ -37,6 +37,7 @@ function Navbar() {
   const userL = getUserInfo();
   const [user] = useState(userL || {});
   const { unreadCount } = useNotifications();
+  const isAdmin = user?.user_role === "admin";
 
   const location = useLocation();
   return (
@@ -73,43 +74,56 @@ function Navbar() {
                     <div className='relative group'>
                       <NavLink
                         state={{ from: location.pathname }}
-                        to={"/posts/history"}
+                        to={"/reports/history"}
                         className={({ isActive }) =>
                           isActive ||
-                          window.location.pathname === "/posts/saved"
+                          window.location.pathname === "/reports/saved"
                             ? "bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
                             : "text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
                         }
                       >
-                        Posts
+                        Reports
                       </NavLink>
                       {/* Submenu */}
                       <div className='absolute z-30 left-0 mt-[4px] hidden w-40 bg-gray-800 shadow-lg group-hover:flex flex-col'>
                         <div className='h-[5px] bg-#1f2937 w-[100%]'></div>
                         <NavLink
                           state={{ from: location.pathname }}
-                          to='/posts/history'
+                          to='/reports/history'
                           className={({ isActive }) =>
                             isActive
                               ? "bg-gray-900 text-white ed-md  px-3 py-2 text-sm font-medium"
                               : "text-gray-300 hover:bg-gray-700  hover:text-white  px-3 py-2 text-sm font-medium"
                           }
                         >
-                          History
+                          My Reports
                         </NavLink>
                         <NavLink
                           state={{ from: location.pathname }}
-                          to='/posts/saved'
+                          to='/reports/saved'
                           className={({ isActive }) =>
                             isActive
                               ? "bg-gray-900 text-white  px-3 py-2 text-sm font-medium"
                               : "text-gray-300 hover:bg-gray-700  hover:text-white  px-3 py-2 text-sm font-medium"
                           }
                         >
-                          Saved
+                          Saved Reports
                         </NavLink>
                       </div>
                     </div>
+                    {isAdmin && (
+                      <NavLink
+                        state={{ from: location.pathname }}
+                        to='/admin/dashboard'
+                        className={({ isActive }) =>
+                          isActive
+                            ? "bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                        }
+                      >
+                        Admin
+                      </NavLink>
+                    )}
                   </div>
                 </div>
               </div>
@@ -199,6 +213,14 @@ function Navbar() {
                   {item.name}
                 </Link>
               ))}
+              {isAdmin && (
+                <Link
+                  to='/admin/dashboard'
+                  className='block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white'
+                >
+                  Admin
+                </Link>
+              )}
             </div>
             <div className='border-t border-gray-700 pt-4 pb-3'>
               <div className='flex items-center px-5'>

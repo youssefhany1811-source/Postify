@@ -10,8 +10,36 @@ use Illuminate\Support\Facades\Storage;
 class Post extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'title', 'body', 'image'];
-    protected $appends = ['likes_count', 'is_saved', 'image_url'];
+    public const CATEGORIES = [
+        'waste',
+        'roads',
+        'street_lights',
+        'water',
+        'safety',
+        'noise',
+        'other',
+    ];
+
+    public const STATUSES = [
+        'new',
+        'under_review',
+        'in_progress',
+        'resolved',
+        'rejected',
+    ];
+
+    protected $fillable = [
+        'user_id',
+        'title',
+        'body',
+        'image',
+        'category',
+        'location',
+        'latitude',
+        'longitude',
+        'status',
+    ];
+    protected $appends = ['likes_count', 'supports_count', 'is_saved', 'image_url'];
 
     public function getIsSavedAttribute()
     {
@@ -19,6 +47,11 @@ class Post extends Model
     }
 
     public function getLikesCountAttribute()
+    {
+        return $this->likedByUsers()->count();
+    }
+
+    public function getSupportsCountAttribute()
     {
         return $this->likedByUsers()->count();
     }

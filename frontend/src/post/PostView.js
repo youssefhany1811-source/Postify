@@ -17,11 +17,11 @@ function PostView() {
   useEffect(() => {
     async function getPost() {
       try {
-        const res = await api.get(`posts/${postId}`);
+        const res = await api.get(`reports/${postId}`);
         setPost(res.data.post);
         setComments(res.data.comments);
         setIsLiked(res.data.post.liked);
-        setLikesCount(res.data.post.likes_count);
+        setLikesCount(res.data.post.supports_count ?? res.data.post.likes_count);
       } catch (error) {
         console.error("Error fetching post:", error);
       }
@@ -33,7 +33,7 @@ function PostView() {
     if (!text.trim()) return;
 
     try {
-      const res = await api.post(`posts/${postId}/comments`, { body: text });
+      const res = await api.post(`reports/${postId}/comments`, { body: text });
       const newComment = {
         ...res.data.comment,
         user: {
@@ -55,7 +55,7 @@ function PostView() {
     setIsLiked((prev) => !prev);
 
     try {
-      let res = await api.post(`posts/${postId}/like`);
+      let res = await api.post(`reports/${postId}/support`);
       if (!res.data.liked) {
         setIsLiked(false);
         setLikesCount((prev) => Math.max(prev - 1, 0));
@@ -81,7 +81,24 @@ function PostView() {
   }
 
   return (
-    <div className='container-c'>
+      <div className='container-c'>
+      <div className='mb-5 flex flex-wrap gap-2 text-sm text-slate-200'>
+        {post?.category && (
+          <span className='report-meta-chip bg-cyan-800/60'>
+            {post.category.replaceAll("_", " ")}
+          </span>
+        )}
+        {post?.status && (
+          <span className='report-meta-chip bg-emerald-800/60'>
+            {post.status.replaceAll("_", " ")}
+          </span>
+        )}
+        {post?.location && (
+          <span className='report-meta-chip bg-slate-700/80'>
+            {post.location}
+          </span>
+        )}
+      </div>
       <div>
         <TextareaAutosize
           value={post?.title}
@@ -103,15 +120,7 @@ function PostView() {
         <TextareaAutosize
           disabled
           value={post?.body}
-          placeholder='Tell Your Story'
-          className='text-2xl'
-        />
-      </div>
-      <div>
-        <TextareaAutosize
-          disabled
-          value={post?.body}
-          placeholder='Tell Your Story'
+          placeholder='Report details'
           className='text-2xl'
         />
       </div>

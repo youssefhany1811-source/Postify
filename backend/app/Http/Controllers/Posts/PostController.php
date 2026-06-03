@@ -20,7 +20,7 @@ class PostController extends Controller
 
         $post = $postService->createPost($request);
         return response()->json([
-            'message' => 'Post created successfully!',
+            'message' => 'Report created successfully!',
             'post' => $post
         ], 201); // 201 for resource created
     }
@@ -49,7 +49,7 @@ class PostController extends Controller
         $result = $postService->getPost($id);
 
         if (!$result) {
-            return response()->json(['message' => 'Post not found'], 404);
+            return response()->json(['message' => 'Report not found'], 404);
         }
 
         return response()->json([
@@ -63,7 +63,7 @@ class PostController extends Controller
         $postArr = $postService->getUserPost($id);
 
         if (!$postArr) {
-            return response()->json(['message' => 'Post not found'], 404);
+            return response()->json(['message' => 'Report not found'], 404);
         }
 
         return response()->json($postArr);
@@ -81,7 +81,7 @@ class PostController extends Controller
         $updatedPost = $postService->updatePost($request, $post);
 
         return response()->json([
-            'message' => 'Post updated successfully!',
+            'message' => 'Report updated successfully!',
             'post' => $updatedPost,
         ], 200);
     }
@@ -92,7 +92,7 @@ class PostController extends Controller
         $postService->deletePost($post);
 
         return response()->json([
-            'message' => 'Post deleted successfully!',
+            'message' => 'Report deleted successfully!',
         ], 200);
     }
 

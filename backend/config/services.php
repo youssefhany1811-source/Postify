@@ -41,4 +41,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'openrouter' => [
+        'key' => env('OPENROUTER_API_KEY'),
+        'url' => env('OPENROUTER_API_URL', 'https://openrouter.ai/api/v1/chat/completions'),
+        'moderation_model' => env('OPENROUTER_MODERATION_MODEL', 'google/gemma-3-12b-it'),
+    ],
+
 ];

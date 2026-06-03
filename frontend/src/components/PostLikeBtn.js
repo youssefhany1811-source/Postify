@@ -19,7 +19,7 @@ function PostLikeBtn({ handlePostLike, isLiked, likesCount }) {
         )}
       </motion.div>
 
-      <div>{likesCount}</div>
+      <div className='ml-1 text-sm text-slate-200'>{likesCount} supports</div>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import api from "../../api/axios";
 import HomeSkeleton from "../skeletons/HomeSkeleton";
 import { usePosts } from "../../context/PostsContext";
 
-function DisplayVisitedUserPosts({ loading, pageTitle = "Posts" }) {
+function DisplayVisitedUserPosts({ loading, pageTitle = "Reports" }) {
   const location = useLocation();
   const { toggleSavedPostState, allPosts } = usePosts();
 
@@ -15,11 +15,11 @@ function DisplayVisitedUserPosts({ loading, pageTitle = "Posts" }) {
     e.preventDefault();
     e.stopPropagation();
 
-    const { id, section } = post;
+    const { id } = post;
     toggleSavedPostState(id); // locally toggle
 
     try {
-      await api.post(`posts/${id}/save`);
+      await api.post(`reports/${id}/save`);
     } catch (error) {
       console.log("+_+_+", error);
     }
@@ -75,14 +75,13 @@ function DisplayVisitedUserPosts({ loading, pageTitle = "Posts" }) {
                   created_at,
                   image_url,
                   is_saved,
-                  section,
                   user,
                 } = post;
 
                 return (
                   <Link
                     state={{ from: location.pathname }}
-                    to={`/view/${id}`}
+                    to={`/reports/${id}`}
                     className='mb-4 block'
                     key={id}
                   >
@@ -91,6 +90,23 @@ function DisplayVisitedUserPosts({ loading, pageTitle = "Posts" }) {
                         <div>
                           <DisplayUser user={user} />
                           <h1 className='text-xl font-bold text-white'>{title || ""}</h1>
+                          <div className='mt-2 flex flex-wrap gap-2 text-xs text-slate-200'>
+                            {post.category && (
+                              <span className='report-meta-chip bg-cyan-800/60'>
+                                {post.category.replaceAll("_", " ")}
+                              </span>
+                            )}
+                            {post.status && (
+                              <span className='report-meta-chip bg-emerald-800/60'>
+                                {post.status.replaceAll("_", " ")}
+                              </span>
+                            )}
+                            {post.location && (
+                              <span className='report-meta-chip bg-slate-700/80'>
+                                {post.location}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div className='text-slate-300 text-sm flex gap-x-[20px] items-center'>
@@ -98,7 +114,7 @@ function DisplayVisitedUserPosts({ loading, pageTitle = "Posts" }) {
                           <div className='flex items-center gap-2 z-10'>
                             <SaveIcon
                               onClick={(e) =>
-                                handleSavePost(e, { id, is_saved, section })
+                                handleSavePost(e, { id, is_saved, section: post.section })
                               }
                               isSaved={is_saved || false}
                             />
@@ -108,7 +124,7 @@ function DisplayVisitedUserPosts({ loading, pageTitle = "Posts" }) {
                       {image_url && (
                         <img
                           src={image_url}
-                          alt={title || "post"}
+                          alt={title || "report"}
                           className='w-[160px] min-w-[160px] h-[120px] rounded-xl object-cover shadow-md'
                         />
                       )}
@@ -118,7 +134,7 @@ function DisplayVisitedUserPosts({ loading, pageTitle = "Posts" }) {
               })
               .filter(Boolean) // Remove null entries
           ) : (
-            <h1>No Posts Found</h1>
+            <h1>No Reports Found</h1>
           )}
         </>
       ) : (

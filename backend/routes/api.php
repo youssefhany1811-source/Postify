@@ -1,11 +1,13 @@
 <?php
 
 use App\Events\NewNotification;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\FireController;
 use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\Posts\PostCommentsController;
+use App\Http\Controllers\Reports\ReportWritingController;
 use App\Http\Controllers\TestJobsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Posts\PostController;
@@ -50,6 +52,24 @@ Route::middleware('auth:sanctum')->prefix('posts')->group(function () {
     Route::post('/{post}/like', [PostInteractionController::class, 'togglePostLike']);
 });
 
+Route::middleware('auth:sanctum')->prefix('reports')->group(function () {
+    Route::get('/home', [PostController::class, 'getHomePosts']);
+    Route::get('/search', [PostController::class, 'postSearch']);
+    Route::post('/enhance', [ReportWritingController::class, 'enhance']);
+    Route::get('/{id}', [PostController::class, 'getPost']);
+
+    Route::post('/', [PostController::class, 'store']);
+    Route::patch('/{post}', [PostController::class, 'update'])->middleware('can:update,post');
+    Route::delete('/{post}', [PostController::class, 'destroy'])->middleware('can:delete,post');
+
+    Route::post('/{post}/save', [PostInteractionController::class, 'togglePostSave']);
+    Route::post('/{post}/support', [PostInteractionController::class, 'togglePostLike']);
+    Route::post('/{post}/comments', [PostCommentsController::class, 'store']);
+    Route::patch('/{post}/comments/{comment}', [PostCommentsController::class, 'update']);
+    Route::patch('/{post}/comments/{comment}/reactions', [PostCommentsController::class, 'updateCommentReactions']);
+    Route::delete('/{post}/comments/{comment}', [PostCommentsController::class, 'destroy']);
+});
+
 Route::middleware('auth:sanctum')->prefix('posts')->group(function () {
     Route::post('{post}/comments', [PostCommentsController::class, 'store']);
     Route::patch('{post}/comments/{comment}', [PostCommentsController::class, 'update']);
@@ -85,6 +105,11 @@ Route::middleware('auth:sanctum')->prefix('/notifications')->group(function () {
     Route::get('/unread-count', [NotificationController::class, 'unReadCount']);
     Route::patch('/{id}', [NotificationController::class, 'markAsRead']);
     Route::delete('/{id}', [NotificationController::class, 'destroy']);
+});
+
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    Route::patch('/reports/{post}/status', [AdminDashboardController::class, 'updateStatus']);
 });
 
 Route::post('/fire', [FireController::class, 'sendAds']);

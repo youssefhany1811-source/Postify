@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Post;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdatePostRequest extends FormRequest
@@ -24,7 +25,11 @@ class UpdatePostRequest extends FormRequest
         return [
             'title' => 'required|min:5|string',
             'body' => 'required|min:20|string',
-            'image' => 'nullable|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4048',
+            'category' => 'required|string|in:' . implode(',', Post::CATEGORIES),
+            'location' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ];
     }
 }

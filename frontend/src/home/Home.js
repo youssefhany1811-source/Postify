@@ -6,7 +6,6 @@ import { useInView } from "motion/react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 function Home() {
-  const [searchLastPage, setSearchLastPage] = useState();
   const [searchPosts, setSearchPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const ref = useRef(null);
@@ -52,13 +51,10 @@ function Home() {
   async function handleSearch(e) {
     handleShow();
     let value = e.target.value;
-    let res = await api.get(`posts/search?query=${value}`);
+    let res = await api.get(`reports/search?query=${value}`);
     if (!res.error) {
       const posts = res.data.data;
-      const lastPage = res.data.last_page;
-
       setSearchPosts(posts);
-      setSearchLastPage(lastPage);
     }
   }
 
@@ -72,7 +68,7 @@ function Home() {
           <CiSearch className='text-cyan-200 size-5 mr-2' />
           <input
             onChange={handleSearch}
-            placeholder='Search'
+            placeholder='Search reports'
             className='bg-transparent border-none w-full outline-none text-slate-100 placeholder-slate-400 !mb-0'
             autoComplete='off'
           />
@@ -88,7 +84,7 @@ function Home() {
             {searchPosts.length > 0 ? (
               searchPosts.map((post, index) => (
                 <Link
-                  to={`/view/${post.id}`}
+                  to={`/reports/${post.id}`}
                   key={index}
                   className='flex gap-3 items-center mb-2 hover:bg-cyan-500/20 p-2 rounded-lg transition'
                 >
@@ -133,7 +129,7 @@ function Home() {
   useEffect(() => {
     async function getPosts() {
       setLoading(true);
-      let res = await api.get(`posts/home?page=${homeCurrentPage}`);
+      let res = await api.get(`reports/home?page=${homeCurrentPage}`);
       if (!res.error) {
         let posts = res.data.posts.data;
         posts.forEach((post) => {

@@ -5,7 +5,7 @@ import api from "../../api/axios";
 import HomeSkeleton from "../skeletons/HomeSkeleton";
 import { usePosts } from "../../context/PostsContext";
 
-function DisplayHomePosts({ pageTitle = "Latest Posts" }) {
+function DisplayHomePosts({ pageTitle = "Latest Reports" }) {
   const location = useLocation();
   const { allPosts, loadHomePosts, toggleSavedPostState } = usePosts();
 
@@ -17,7 +17,7 @@ function DisplayHomePosts({ pageTitle = "Latest Posts" }) {
     toggleSavedPostState(postId);
 
     try {
-      await api.post(`posts/${postId}/save`);
+      await api.post(`reports/${postId}/save`);
     } catch (error) {
       console.log(error);
     }
@@ -54,11 +54,6 @@ function DisplayHomePosts({ pageTitle = "Latest Posts" }) {
     );
   }
 
-  function viewOrEditPost(canUpdate) {
-    if (canUpdate) return "edit";
-    return "view";
-  }
-
   return (
     <>
       <h1 className='page-title'>{pageTitle}</h1>
@@ -77,11 +72,14 @@ function DisplayHomePosts({ pageTitle = "Latest Posts" }) {
                 const is_saved = post.is_saved || false;
                 const section = post.section;
                 const canUpdate = post.canUpdate || false;
+                const category = post.category;
+                const status = post.status;
+                const locationLabel = post.location;
 
                 return (
                   <Link
                     state={{ from: location.pathname }}
-                    to={`/${viewOrEditPost(canUpdate)}/${id}`}
+                    to={canUpdate ? `/reports/${id}/edit` : `/reports/${id}`}
                     className='mb-4 block'
                     key={id}
                   >
@@ -90,6 +88,23 @@ function DisplayHomePosts({ pageTitle = "Latest Posts" }) {
                         <div>
                           {user && <DisplayUser user={user} />}
                           <h1 className='text-xl font-bold text-white'>{title}</h1>
+                          <div className='mt-2 flex flex-wrap gap-2 text-xs text-slate-200'>
+                            {category && (
+                              <span className='report-meta-chip bg-cyan-800/60'>
+                                {category.replaceAll("_", " ")}
+                              </span>
+                            )}
+                            {status && (
+                              <span className='report-meta-chip bg-emerald-800/60'>
+                                {status.replaceAll("_", " ")}
+                              </span>
+                            )}
+                            {locationLabel && (
+                              <span className='report-meta-chip bg-slate-700/80'>
+                                {locationLabel}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div className='text-slate-300 text-sm flex gap-x-[20px] items-center'>
@@ -117,7 +132,7 @@ function DisplayHomePosts({ pageTitle = "Latest Posts" }) {
               })
               .filter(Boolean)
           ) : (
-            <div className='text-slate-300'>No posts found yet.</div>
+            <div className='text-slate-300'>No reports found yet.</div>
           )}
         </>
       ) : (

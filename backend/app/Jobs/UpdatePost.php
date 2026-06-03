@@ -19,6 +19,10 @@ class UpdatePost implements ShouldQueue
         private Post $post,
         private string $title,
         private string $body,
+        private string $category,
+        private ?string $location,
+        private float|null $latitude,
+        private float|null $longitude,
         private ?string $imagePath,
         private ?string $oldImagePath
     ) {}
@@ -41,6 +45,10 @@ class UpdatePost implements ShouldQueue
             $post,
             $request->title,
             $request->body,
+            $request->category,
+            $request->location,
+            $request->latitude,
+            $request->longitude,
             $imagePath,
             $oldImagePath
         );
@@ -54,6 +62,10 @@ class UpdatePost implements ShouldQueue
         $data = [
             'title' => $this->title,
             'body' => $this->body,
+            'category' => $this->category,
+            'location' => $this->location,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
         ];
 
         // Add image path if a new image was uploaded

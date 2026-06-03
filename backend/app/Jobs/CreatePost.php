@@ -20,6 +20,10 @@ class CreatePost implements ShouldQueue
     public function __construct(
         private string $title,
         private string $body,
+        private string $category,
+        private ?string $location,
+        private float|null $latitude,
+        private float|null $longitude,
         private ?string $imagePath,
     ) {}
 
@@ -60,6 +64,10 @@ class CreatePost implements ShouldQueue
         return new self(
             $request->title,
             $request->body,
+            $request->category,
+            $request->location,
+            $request->latitude,
+            $request->longitude,
             $imagePath
         );
     }
@@ -74,6 +82,11 @@ class CreatePost implements ShouldQueue
             'user_id' => Auth::id(),
             'title' => $this->title,
             'body' => $this->body,
+            'category' => $this->category,
+            'location' => $this->location,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'status' => Post::STATUSES[0],
             'image' => $this->imagePath,
         ]);
 

@@ -8,7 +8,7 @@ import SavedSkeleton from "../skeletons/SavedSkeleton";
 import { usePosts } from "../../context/PostsContext";
 
 function DisplayHistoryOrSavedPosts({ loading, pageTitle, type }) {
-  const category = pageTitle.toLocaleLowerCase(); // get posts group history | saved
+  const sectionKey = type === "edit" ? "history" : "saved";
   const location = useLocation();
   const { allPosts, toggleSavedPostState } = usePosts();
 
@@ -20,7 +20,7 @@ function DisplayHistoryOrSavedPosts({ loading, pageTitle, type }) {
     toggleSavedPostState(postId);
 
     try {
-      await api.post(`posts/${postId}/save`);
+      await api.post(`reports/${postId}/save`);
     } catch (error) {
       console.log(error);
     }
@@ -63,8 +63,8 @@ function DisplayHistoryOrSavedPosts({ loading, pageTitle, type }) {
       {!loading ? (
         <>
           <h1 className='page-title'>{pageTitle}</h1>
-          {allPosts[category].allIds.length !== 0 ? (
-            allPosts[category].allIds
+          {allPosts[sectionKey].allIds.length !== 0 ? (
+            allPosts[sectionKey].allIds
               .map((id) => {
                 const post = allPosts.byId[id];
 
@@ -77,11 +77,14 @@ function DisplayHistoryOrSavedPosts({ loading, pageTitle, type }) {
                 const is_saved = post.is_saved || false;
                 const section = post.section;
                 const is_hero = post.is_hero || false;
+                const categoryValue = post.category;
+                const statusValue = post.status;
+                const locationValue = post.location;
 
                 return (
                   <Link
                     state={{ from: location.pathname }}
-                    to={`/${type}/${id}`}
+                    to={type === "edit" ? `/reports/${id}/edit` : `/reports/${id}`}
                     className='mb-4 block'
                     key={id}
                   >
@@ -93,6 +96,23 @@ function DisplayHistoryOrSavedPosts({ loading, pageTitle, type }) {
                           )}
 
                           <h1 className='text-xl font-bold text-white'>{title}</h1>
+                          <div className='mt-2 flex flex-wrap gap-2 text-xs text-slate-200'>
+                            {categoryValue && (
+                              <span className='report-meta-chip bg-cyan-800/60'>
+                                {categoryValue.replaceAll("_", " ")}
+                              </span>
+                            )}
+                            {statusValue && (
+                              <span className='report-meta-chip bg-emerald-800/60'>
+                                {statusValue.replaceAll("_", " ")}
+                              </span>
+                            )}
+                            {locationValue && (
+                              <span className='report-meta-chip bg-slate-700/80'>
+                                {locationValue}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div className='text-slate-300 text-sm flex gap-x-[20px] items-center'>
@@ -127,7 +147,7 @@ function DisplayHistoryOrSavedPosts({ loading, pageTitle, type }) {
               })
               .filter(Boolean) // Remove null entries
           ) : (
-            <h1>No Posts Found</h1>
+            <h1>No Reports Found</h1>
           )}
         </>
       ) : (
