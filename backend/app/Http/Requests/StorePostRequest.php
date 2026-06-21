@@ -30,6 +30,7 @@ class StorePostRequest extends FormRequest
             'location' => 'nullable|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
+            'contact_phone' => 'required|string|min:7|max:32|regex:/^[0-9+()\-\s]+$/',
         ];
     }
 }

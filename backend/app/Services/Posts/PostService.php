@@ -67,6 +67,7 @@ class PostService
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'status' => Post::STATUSES[0],
+            'contact_phone' => $request->contact_phone,
         ]);
 
         $user = Auth::user();

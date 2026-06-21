@@ -10,6 +10,11 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    public const ROLE_USER = 'user';
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_ENTITY_GIZA = 'entity_giza';
+
     protected $fillable = ['username', 'email', 'password', 'user_role', 'avatar', 'gender', 'description'];
 
     public function posts()
@@ -39,6 +44,11 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->user_role === 'admin';
+        return $this->user_role === self::ROLE_ADMIN;
+    }
+
+    public function isGizaEntity(): bool
+    {
+        return $this->user_role === self::ROLE_ENTITY_GIZA;
     }
 }

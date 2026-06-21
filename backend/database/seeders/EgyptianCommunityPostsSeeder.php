@@ -25,27 +25,24 @@ class EgyptianCommunityPostsSeeder extends Seeder
         ];
 
         $users = collect([
-            User::create([
+            User::updateOrCreate(['email' => 'ahmed.shoubra@postify.local'], [
                 'username' => 'أحمد',
-                'email' => 'ahmed.shoubra@postify.local',
                 'password' => Hash::make('password123'),
-                'user_role' => 'user',
+                'user_role' => User::ROLE_USER,
                 'description' => 'مهتم بمشاكل الشارع والنظافة العامة.',
                 'avatar' => $avatars[0],
             ]),
-            User::create([
+            User::updateOrCreate(['email' => 'mona.faisal@postify.local'], [
                 'username' => 'منى',
-                'email' => 'mona.faisal@postify.local',
                 'password' => Hash::make('password123'),
-                'user_role' => 'user',
+                'user_role' => User::ROLE_USER,
                 'description' => 'بتابع مشاكل المرور والمرافق في المنطقة.',
                 'avatar' => $avatars[1],
             ]),
-            User::create([
+            User::updateOrCreate(['email' => 'karim.maadi@postify.local'], [
                 'username' => 'كريم',
-                'email' => 'karim.maadi@postify.local',
                 'password' => Hash::make('password123'),
-                'user_role' => 'user',
+                'user_role' => User::ROLE_USER,
                 'description' => 'مهتم بالأمان والإنارة في الشوارع.',
                 'avatar' => $avatars[2],
             ]),

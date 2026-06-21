@@ -24,6 +24,7 @@ class CreatePost implements ShouldQueue
         private ?string $location,
         private float|null $latitude,
         private float|null $longitude,
+        private string $contactPhone,
         private ?string $imagePath,
     ) {}
 
@@ -68,6 +69,7 @@ class CreatePost implements ShouldQueue
             $request->location,
             $request->latitude,
             $request->longitude,
+            $request->contact_phone,
             $imagePath
         );
     }
@@ -87,6 +89,7 @@ class CreatePost implements ShouldQueue
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'status' => Post::STATUSES[0],
+            'contact_phone' => $this->contactPhone,
             'image' => $this->imagePath,
         ]);
 

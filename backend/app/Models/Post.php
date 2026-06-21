@@ -28,6 +28,13 @@ class Post extends Model
         'rejected',
     ];
 
+    public const GIZA_BOUNDS = [
+        'min_latitude' => 29.75,
+        'max_latitude' => 30.25,
+        'min_longitude' => 30.70,
+        'max_longitude' => 31.35,
+    ];
+
     protected $fillable = [
         'user_id',
         'title',
@@ -38,6 +45,7 @@ class Post extends Model
         'latitude',
         'longitude',
         'status',
+        'contact_phone',
     ];
     protected $appends = ['likes_count', 'supports_count', 'is_saved', 'image_url'];
 
@@ -106,5 +114,25 @@ class Post extends Model
         return $query->where('user_id', Auth::id())
             ->withExists('savedByUsers as is_saved')
             ->latest();
+    }
+
+    public function scopeInGizaRegion($query)
+    {
+        return $query->where(function ($q) {
+            $q->where(function ($coordinateQuery) {
+                $coordinateQuery
+                    ->whereBetween('latitude', [
+                        self::GIZA_BOUNDS['min_latitude'],
+                        self::GIZA_BOUNDS['max_latitude'],
+                    ])
+                    ->whereBetween('longitude', [
+                        self::GIZA_BOUNDS['min_longitude'],
+                        self::GIZA_BOUNDS['max_longitude'],
+                    ]);
+            })
+                ->orWhere('location', 'like', '%Giza%')
+                ->orWhere('location', 'like', '%giza%')
+                ->orWhere('location', 'like', '%الجيزة%');
+        });
     }
 }

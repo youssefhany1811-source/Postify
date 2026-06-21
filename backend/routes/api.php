@@ -4,6 +4,7 @@ use App\Events\NewNotification;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Entity\GizaReportsController;
 use App\Http\Controllers\FireController;
 use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\Posts\PostCommentsController;
@@ -110,6 +111,12 @@ Route::middleware('auth:sanctum')->prefix('/notifications')->group(function () {
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
     Route::patch('/reports/{post}/status', [AdminDashboardController::class, 'updateStatus']);
+});
+
+Route::middleware('auth:sanctum')->prefix('entity/giza')->group(function () {
+    Route::get('/reports', [GizaReportsController::class, 'index']);
+    Route::get('/reports/{post}', [GizaReportsController::class, 'show']);
+    Route::patch('/reports/{post}/status', [GizaReportsController::class, 'updateStatus']);
 });
 
 Route::post('/fire', [FireController::class, 'sendAds']);
