@@ -13,11 +13,15 @@ function PostView() {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const user = JSON.parse(localStorage.getItem("user"));
+  const isGizaEntity = user?.user_role === "entity_giza";
 
   useEffect(() => {
     async function getPost() {
       try {
-        const res = await api.get(`reports/${postId}`);
+        const endpoint = isGizaEntity
+          ? `entity/giza/reports/${postId}`
+          : `reports/${postId}`;
+        const res = await api.get(endpoint);
         setPost(res.data.post);
         setComments(res.data.comments);
         setIsLiked(res.data.post.liked);
@@ -27,7 +31,7 @@ function PostView() {
       }
     }
     getPost();
-  }, [postId]);
+  }, [postId, isGizaEntity]);
 
   async function addComment(text) {
     if (!text.trim()) return;
@@ -96,6 +100,11 @@ function PostView() {
         {post?.location && (
           <span className='report-meta-chip bg-slate-700/80'>
             {post.location}
+          </span>
+        )}
+        {post?.contact_phone && (
+          <span className='report-meta-chip bg-slate-700/80'>
+            phone: {post.contact_phone}
           </span>
         )}
       </div>

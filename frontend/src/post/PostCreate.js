@@ -21,6 +21,7 @@ function PostCreate() {
   const [body, setBody] = useState("");
   const [category, setCategory] = useState("other");
   const [location, setLocation] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [image, setImage] = useState(null);
@@ -52,6 +53,7 @@ function PostCreate() {
       formData.append("body", body);
       formData.append("category", category);
       formData.append("location", location);
+      formData.append("contact_phone", contactPhone);
       if (latitude) formData.append("latitude", latitude);
       if (longitude) formData.append("longitude", longitude);
       if (image) formData.append("image", image);
@@ -88,7 +90,7 @@ function PostCreate() {
   }
 
   return (
-    <div className='container-c'>
+    <div className='mx-auto max-w-4xl px-4 pb-10'>
       <AlertPopup
         is_open={isOpen}
         setIs_open={setIsOpen}
@@ -97,7 +99,12 @@ function PostCreate() {
 
       <div className='cool-panel'>
         <div className='mb-6 flex flex-wrap items-center justify-between gap-4'>
-          <h1 className='page-title mb-0'>Report a Community Issue</h1>
+          <div>
+            <h1 className='page-title mb-2'>Report a Community Issue</h1>
+            <p className='text-sm text-slate-400'>
+              Add the issue details, location, and contact number for follow-up.
+            </p>
+          </div>
           <button
             onClick={handlePostPublish}
             disabled={isLoading}
@@ -107,82 +114,140 @@ function PostCreate() {
           </button>
         </div>
 
-        <label
-          className={`upload-zone mb-5 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-        >
-          <span>Upload a photo of the issue</span>
-          <input
-            type='file'
-            className='hidden'
-            disabled={isLoading}
-            onChange={handleImageChange}
-          />
-        </label>
+        <div className='space-y-6'>
+          <section className='rounded-2xl border border-slate-700 bg-slate-950/30 p-4'>
+            <div className='mb-4'>
+              <h2 className='text-xl font-semibold text-white'>Issue details</h2>
+            </div>
 
-        <TextareaAutosize
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder='A title that pulls readers in'
-          disabled={isLoading}
-          className='cool-title-input'
-        />
+            <label className='mb-2 text-sm font-semibold text-slate-200'>
+              Title
+            </label>
+            <TextareaAutosize
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder='Example: Broken street light near Giza Square'
+              disabled={isLoading}
+              className='cool-title-input text-3xl md:text-4xl'
+            />
 
-        <div className='mb-5 grid gap-4 md:grid-cols-2'>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            <div className='grid gap-4 md:grid-cols-2'>
+              <div>
+                <label className='mb-2 text-sm font-semibold text-slate-200'>
+                  Category
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  disabled={isLoading}
+                  className='report-field report-select'
+                >
+                  {categories.map((item) => (
+                    <option key={item} value={item}>
+                      {item.replaceAll("_", " ")}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className='mb-2 text-sm font-semibold text-slate-200'>
+                  Location or neighborhood
+                </label>
+                <input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder='Example: Faisal Street, Giza'
+                  disabled={isLoading}
+                  className='report-field'
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className='rounded-2xl border border-slate-700 bg-slate-950/30 p-4'>
+            <div className='mb-4'>
+              <h2 className='text-xl font-semibold text-white'>Contact and map</h2>
+            </div>
+
+            <label className='mb-2 text-sm font-semibold text-slate-200'>
+              Phone number
+            </label>
+            <input
+              type='tel'
+              value={contactPhone}
+              onChange={(e) => setContactPhone(e.target.value)}
+              placeholder='Example: +20 10 0000 0000'
+              disabled={isLoading}
+              className='report-field'
+            />
+            <p className='mt-2 mb-5 text-xs leading-5 text-slate-400'>
+              We ask for this number so the responsible team can contact you if they need exact access details or clarification before fixing the issue.
+            </p>
+
+            <ReportLocationPicker
+              latitude={latitude}
+              longitude={longitude}
+              disabled={isLoading}
+              onChange={(nextLat, nextLng) => {
+                setLatitude(String(nextLat));
+                setLongitude(String(nextLng));
+              }}
+            />
+          </section>
+
+          <section className='rounded-2xl border border-slate-700 bg-slate-950/30 p-4'>
+            <div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
+              <h2 className='text-xl font-semibold text-white'>Description and photo</h2>
+              <label
+                className={`upload-zone min-w-[220px] px-4 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                <span>Upload photo</span>
+                <input
+                  type='file'
+                  className='hidden'
+                  disabled={isLoading}
+                  onChange={handleImageChange}
+                />
+              </label>
+            </div>
+
+            {preview && (
+              <div className='mb-5'>
+                <img className='post-cover-preview' src={preview} alt='post preview' />
+              </div>
+            )}
+
+            <label className='mb-2 text-sm font-semibold text-slate-200'>
+              Description
+            </label>
+            <TextareaAutosize
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder='Describe what happened, how long it has been there, and any safety risks.'
+              disabled={isLoading}
+              className='cool-body-input'
+            />
+
+            <ReportWritingAssistant
+              title={title}
+              body={body}
+              disabled={isLoading}
+              onApply={(report) => {
+                setTitle(report.title);
+                setBody(report.body);
+              }}
+            />
+          </section>
+
+          <button
+            onClick={handlePostPublish}
             disabled={isLoading}
-            className='report-field report-select'
+            className={`action-btn w-full ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
           >
-            {categories.map((item) => (
-              <option key={item} value={item}>
-                {item.replaceAll("_", " ")}
-              </option>
-            ))}
-          </select>
-
-          <input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder='Location or neighborhood'
-            disabled={isLoading}
-            className='report-field'
-          />
+            {isLoading ? "Submitting..." : "Submit Report"}
+          </button>
         </div>
-
-        <ReportLocationPicker
-          latitude={latitude}
-          longitude={longitude}
-          disabled={isLoading}
-          onChange={(nextLat, nextLng) => {
-            setLatitude(String(nextLat));
-            setLongitude(String(nextLng));
-          }}
-        />
-
-        {preview && (
-          <div className='mb-8'>
-            <img className='post-cover-preview' src={preview} alt='post preview' />
-          </div>
-        )}
-
-        <TextareaAutosize
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder='Describe the problem clearly...'
-          disabled={isLoading}
-          className='cool-body-input'
-        />
-
-        <ReportWritingAssistant
-          title={title}
-          body={body}
-          disabled={isLoading}
-          onApply={(report) => {
-            setTitle(report.title);
-            setBody(report.body);
-          }}
-        />
       </div>
     </div>
   );

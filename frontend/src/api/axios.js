@@ -9,13 +9,10 @@ api.interceptors.request.use(
     const token = localStorage.getItem("auth_token");
     console.log("token ==", token);
 
-    if (!token) {
-      return Promise.reject({
-        message: "No auth token found",
-        code: "NO_AUTH_TOKEN",
-      });
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    config.headers.Authorization = `Bearer ${token}`;
+
     return config;
   },
   (error) => Promise.reject(error)

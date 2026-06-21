@@ -48,9 +48,16 @@ function loadLeafletAssets() {
 
 export default function AdminReportsMap({
   reports,
-  statusFilter,
-  categoryFilter,
-  query,
+  statusFilter = "all",
+  categoryFilter = "all",
+  query = "",
+  defaultCenter = DEFAULT_CENTER,
+  defaultZoom = 11,
+  regionBounds = null,
+  emptyMessage = "No mapped reports match the current filters.",
+  summaryLabel = "plotted reports",
+  showJumpList = true,
+  showDebug = false,
 }) {
   const mapElementRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -59,6 +66,15 @@ export default function AdminReportsMap({
   const [isReady, setIsReady] = useState(false);
   const [projectedReports, setProjectedReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
+
+  const normalizedRegionBounds = useMemo(() => {
+    if (!regionBounds) return null;
+
+    return [
+      [regionBounds.min_latitude, regionBounds.min_longitude],
+      [regionBounds.max_latitude, regionBounds.max_longitude],
+    ];
+  }, [regionBounds]);
 
   const filteredReports = useMemo(() => {
     return reports.filter((report) => {
@@ -96,8 +112,8 @@ export default function AdminReportsMap({
         }
 
         const map = L.map(mapElementRef.current, {
-          center: [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
-          zoom: 11,
+          center: [defaultCenter.lat, defaultCenter.lng],
+          zoom: defaultZoom,
           zoomControl: true,
         });
 
@@ -129,15 +145,34 @@ export default function AdminReportsMap({
         layerGroupRef.current = null;
       }
     };
-  }, []);
+  }, [defaultCenter.lat, defaultCenter.lng, defaultZoom]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !layerGroupRef.current || !window.L) return;
 
     layerGroupRef.current.clearLayers();
 
+    if (normalizedRegionBounds) {
+      window.L.rectangle(normalizedRegionBounds, {
+        color: "#22d3ee",
+        weight: 1,
+        dashArray: "6 6",
+        fillColor: "#22d3ee",
+        fillOpacity: 0.04,
+      }).addTo(layerGroupRef.current);
+    }
+
     if (validMappedReports.length === 0) {
-      mapInstanceRef.current.setView([DEFAULT_CENTER.lat, DEFAULT_CENTER.lng], 11);
+      if (normalizedRegionBounds) {
+        mapInstanceRef.current.fitBounds(normalizedRegionBounds, {
+          padding: [30, 30],
+        });
+      } else {
+        mapInstanceRef.current.setView(
+          [defaultCenter.lat, defaultCenter.lng],
+          defaultZoom
+        );
+      }
       setTimeout(() => mapInstanceRef.current?.invalidateSize(), 50);
       return;
     }
@@ -160,7 +195,13 @@ export default function AdminReportsMap({
       mapInstanceRef.current.fitBounds(bounds, { padding: [30, 30] });
       setTimeout(() => mapInstanceRef.current?.invalidateSize(), 50);
     }
-  }, [validMappedReports]);
+  }, [
+    validMappedReports,
+    normalizedRegionBounds,
+    defaultCenter.lat,
+    defaultCenter.lng,
+    defaultZoom,
+  ]);
 
   useEffect(() => {
     const map = mapInstanceRef.current;
@@ -231,6 +272,7 @@ export default function AdminReportsMap({
               key={report.id}
               type='button'
               className='admin-report-pin-button'
+              aria-label={`Focus report ${report.title}`}
               style={{
                 left: `${x}px`,
                 top: `${y}px`,
@@ -246,7 +288,7 @@ export default function AdminReportsMap({
 
         {isReady && validMappedReports.length === 0 && (
           <div className='admin-report-map-overlay'>
-            No mapped reports match the current filters.
+            {emptyMessage}
           </div>
         )}
       </div>
@@ -256,7 +298,7 @@ export default function AdminReportsMap({
       )}
 
       <div className='mt-3 text-xs text-slate-400'>
-        Showing {validMappedReports.length} plotted reports out of {filteredReports.length} filtered reports.
+        Showing {validMappedReports.length} {summaryLabel} out of {filteredReports.length} filtered reports.
       </div>
       {selectedReport && (
         <div className='mt-3 rounded-xl border border-cyan-300/30 bg-slate-950/50 p-3 text-sm text-slate-200'>
@@ -265,35 +307,39 @@ export default function AdminReportsMap({
             {formatLabel(selectedReport.category)} | {formatLabel(selectedReport.status)} | {selectedReport.location || "No location"}
           </div>
           <div className='mt-1 text-xs text-slate-400'>
-            Reporter: {selectedReport.user?.username || "Unknown"} | Supports: {selectedReport.supports_count ?? 0} | Comments: {selectedReport.comments_count ?? 0}
+            Reporter: {selectedReport.user?.username || "Unknown"} | Phone: {selectedReport.contact_phone || "Not provided"} | Supports: {selectedReport.supports_count ?? 0} | Comments: {selectedReport.comments_count ?? 0}
           </div>
         </div>
       )}
-      <div className='mt-3'>
-        <div className='mb-2 text-sm font-semibold text-slate-200'>
-          Jump to mapped report
+      {showJumpList && validMappedReports.length > 0 && (
+        <div className='mt-3'>
+          <div className='mb-2 text-sm font-semibold text-slate-200'>
+            Jump to mapped report
+          </div>
+          <div className='flex flex-wrap gap-2'>
+            {validMappedReports.map((report) => (
+              <button
+                key={report.id}
+                type='button'
+                onClick={() => focusReport(report)}
+                className='admin-map-report-btn'
+              >
+                #{report.id} {report.title}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className='flex flex-wrap gap-2'>
+      )}
+      {showDebug && (
+        <div className='mt-2 rounded-xl bg-slate-950/40 p-3 text-xs text-slate-400'>
+          <div className='font-semibold text-slate-300 mb-2'>Map debug</div>
           {validMappedReports.map((report) => (
-            <button
-              key={report.id}
-              type='button'
-              onClick={() => focusReport(report)}
-              className='admin-map-report-btn'
-            >
-              #{report.id} {report.title}
-            </button>
+            <div key={report.id}>
+              #{report.id} - {report.latitude}, {report.longitude}
+            </div>
           ))}
         </div>
-      </div>
-      <div className='mt-2 rounded-xl bg-slate-950/40 p-3 text-xs text-slate-400'>
-        <div className='font-semibold text-slate-300 mb-2'>Map debug</div>
-        {validMappedReports.map((report) => (
-          <div key={report.id}>
-            #{report.id} — {report.latitude}, {report.longitude}
-          </div>
-        ))}
-      </div>
+      )}
     </div>
   );
 }

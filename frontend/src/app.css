@@ -230,6 +230,61 @@ button {
   line-height: 1;
 }
 
+.admin-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.56);
+  padding: 8px;
+}
+
+.admin-tab {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-align: left;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.admin-tab:hover {
+  border-color: rgba(125, 211, 252, 0.26);
+  background: rgba(8, 47, 73, 0.32);
+  color: #f8fafc;
+}
+
+.admin-tab.active {
+  border-color: rgba(34, 211, 238, 0.52);
+  background: rgba(34, 211, 238, 0.14);
+  color: #e0faff;
+}
+
+.admin-tab-count {
+  min-width: 34px;
+  border-radius: 9999px;
+  background: rgba(2, 6, 23, 0.46);
+  padding: 4px 8px;
+  color: #f8fafc;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .admin-tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 .report-map-wrapper {
   margin-bottom: 1.25rem;
 }
@@ -245,6 +300,8 @@ button {
 
 .admin-report-map-shell {
   position: relative;
+  overflow: hidden;
+  border-radius: 18px;
 }
 
 .admin-report-map-canvas {

@@ -37,7 +37,21 @@ function Navbar() {
   const userL = getUserInfo();
   const [user] = useState(userL || {});
   const { unreadCount } = useNotifications();
-  const isAdmin = user?.user_role === "admin";
+  const hasAdminAccess = user.user_role === "admin";
+  const hasGizaEntityAccess = user.user_role === "entity_giza";
+  const desktopNavigation = [
+    ...navigation,
+    ...(hasGizaEntityAccess
+      ? [{ name: "Giza Entity", href: "/entity/giza" }]
+      : []),
+  ];
+  const mobileNavigation = [
+    ...navMobile,
+    ...(hasGizaEntityAccess
+      ? [{ name: "Giza Entity", href: "/entity/giza" }]
+      : []),
+    ...(hasAdminAccess ? [{ name: "Admin", href: "/admin/dashboard" }] : []),
+  ];
 
   const location = useLocation();
   return (
@@ -56,7 +70,7 @@ function Navbar() {
                 </div>
                 <div className='hidden md:block'>
                   <div className='ml-10 flex items-baseline space-x-4'>
-                    {navigation.map((item, index) => (
+                    {desktopNavigation.map((item) => (
                       <NavLink
                         state={{ from: location.pathname }}
                         key={item.name}
@@ -111,7 +125,7 @@ function Navbar() {
                         </NavLink>
                       </div>
                     </div>
-                    {isAdmin && (
+                    {hasAdminAccess && (
                       <NavLink
                         state={{ from: location.pathname }}
                         to='/admin/dashboard'
@@ -198,9 +212,9 @@ function Navbar() {
 
           <DisclosurePanel className='md:hidden'>
             <div className='space-y-1 px-2 pt-2 pb-3 sm:px-3'>
-              {navMobile.map((item, index) => (
+              {mobileNavigation.map((item) => (
                 <Link
-                  key={index}
+                  key={item.name}
                   aria-current={item.current ? "page" : undefined}
                   to={item.href}
                   className={classNames(
@@ -213,14 +227,6 @@ function Navbar() {
                   {item.name}
                 </Link>
               ))}
-              {isAdmin && (
-                <Link
-                  to='/admin/dashboard'
-                  className='block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white'
-                >
-                  Admin
-                </Link>
-              )}
             </div>
             <div className='border-t border-gray-700 pt-4 pb-3'>
               <div className='flex items-center px-5'>

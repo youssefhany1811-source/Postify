@@ -25,6 +25,7 @@ function PostEdit() {
   const [body, setBody] = useState("");
   const [category, setCategory] = useState("other");
   const [locationValue, setLocationValue] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [status, setStatus] = useState("new");
@@ -91,6 +92,7 @@ function PostEdit() {
       setImage(res.data.post.image_url);
       setCategory(res.data.post.category || "other");
       setLocationValue(res.data.post.location || "");
+      setContactPhone(res.data.post.contact_phone || "");
       setLatitude(res.data.post.latitude || "");
       setLongitude(res.data.post.longitude || "");
       setStatus(res.data.post.status || "new");
@@ -115,6 +117,7 @@ function PostEdit() {
       formData.append("body", body);
       formData.append("category", category);
       formData.append("location", locationValue);
+      formData.append("contact_phone", contactPhone);
       if (latitude) formData.append("latitude", latitude);
       if (longitude) formData.append("longitude", longitude);
       formData.append("_method", "PATCH");
@@ -274,6 +277,21 @@ function PostEdit() {
             placeholder='Location or neighborhood'
             className='report-field'
           />
+        </div>
+        <div className='mb-5'>
+          <label className='mb-2 text-sm font-semibold text-slate-200'>
+            Phone number
+          </label>
+          <input
+            type='tel'
+            value={contactPhone}
+            onChange={(e) => setContactPhone(e.target.value)}
+            placeholder='Example: +20 10 0000 0000'
+            className='report-field'
+          />
+          <p className='mt-2 text-xs leading-5 text-slate-400'>
+            We ask for this number so the responsible team can contact you if they need exact access details or clarification before fixing the issue.
+          </p>
         </div>
         <ReportLocationPicker
           latitude={latitude}

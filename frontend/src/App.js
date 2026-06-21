@@ -18,6 +18,7 @@ const PostView = lazy(() => import("./post/PostView"));
 const UserProfile = lazy(() => import("./user/UserProfile"));
 const PostCreate = lazy(() => import("./post/PostCreate"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const GizaEntityDashboard = lazy(() => import("./pages/GizaEntityDashboard"));
 
 function App() {
   useEffect(() => {
@@ -45,6 +46,8 @@ function App() {
           <Route path='/auth/google' element={<GoogleCallback />} />
           <Route element={<Protected />}>
             <Route element={<Navbar />}>
+              <Route path='/admin/dashboard' element={<AdminDashboard />} />
+              <Route path='/entity/giza' element={<GizaEntityDashboard />} />
               <Route path='/user/:visitedUserId' element={<VisitedUser />} />
               <Route path='/' element={<Home />} />
               <Route path='/reports/new' element={<PostCreate />} />
@@ -52,7 +55,6 @@ function App() {
               <Route path='/reports/:id/edit' element={<PostEdit />} />
               <Route path='/reports/history' element={<History />} />
               <Route path='/reports/saved' element={<Saved />} />
-              <Route path='/admin/dashboard' element={<AdminDashboard />} />
               <Route path='/view/:id' element={<PostView />} />
               <Route path='/notifications' element={<Notifications />} />
               <Route path='/profile' element={<UserProfile />} />
